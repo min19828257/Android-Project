@@ -8,22 +8,29 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 
 public class MainActivity extends Activity {
     private String fname = "memo.txt";
     private EditText ed;
+
+    static int cnt;
 
     //Using the Accelometer & Gyroscoper
     private SensorManager mSensorManager = null;
@@ -128,21 +135,21 @@ public class MainActivity extends Activity {
             timestamp = event.timestamp;
 
             /* 맨 센서 인식을 활성화 하여 처음 timestamp가 0일때는 dt값이 올바르지 않으므로 넘어간다. */
-            if (dt - timestamp*NS2S != 0) {
+            if (dt - timestamp * NS2S != 0) {
 
                 /* 각속도 성분을 적분 -> 회전각(pitch, roll)으로 변환.
                  * 여기까지의 pitch, roll의 단위는 '라디안'이다.
                  * SO 아래 로그 출력부분에서 멤버변수 'RAD2DGR'를 곱해주어 degree로 변환해줌.  */
-                pitch = pitch + gyroY*dt;
-                roll = roll + gyroX*dt;
-                yaw = yaw + gyroZ*dt;
+                pitch = pitch + gyroY * dt;
+                roll = roll + gyroX * dt;
+                yaw = yaw + gyroZ * dt;
 
                 Log.d("LOG", "GYROSCOPE           [X]:" + String.format("%.4f", event.values[0])
                         + "           [Y]:" + String.format("%.4f", event.values[1])
                         + "           [Z]:" + String.format("%.4f", event.values[2])
-                        + "           [Pitch]: " + String.format("%.1f", pitch*RAD2DGR)
-                        + "           [Roll]: " + String.format("%.1f", roll*RAD2DGR)
-                        + "           [Yaw]: " + String.format("%.1f", yaw*RAD2DGR)
+                        + "           [Pitch]: " + String.format("%.1f", pitch * RAD2DGR)
+                        + "           [Roll]: " + String.format("%.1f", roll * RAD2DGR)
+                        + "           [Yaw]: " + String.format("%.1f", yaw * RAD2DGR)
                         + "           [dt]: " + String.format("%.4f", dt));
 
                 // 출력 io 생성
@@ -151,14 +158,91 @@ public class MainActivity extends Activity {
                 if (!file.exists())
                     return;
 
-                ed.setText("GYROSCOPE\n  [X]:" + String.format("%.4f", event.values[0])+"\n"
-                        + "  [Y]:" + String.format("%.4f", event.values[1])+"\n"
-                        + "  [Z]:" + String.format("%.4f", event.values[2])+"\n"
-                        + "  [Pitch]: " + String.format("%.1f", pitch*RAD2DGR)+"\n"
-                        + "  [Roll]: " + String.format("%.1f", roll*RAD2DGR)+"\n"
-                        + "  [Yaw]: " + String.format("%.1f", yaw*RAD2DGR)+"\n"
+                ed.setText("GYROSCOPE\n  [X]:" + String.format("%.4f", event.values[0]) + "\n"
+                        + "  [Y]:" + String.format("%.4f", event.values[1]) + "\n"
+                        + "  [Z]:" + String.format("%.4f", event.values[2]) + "\n"
+                        + "  [Pitch]: " + String.format("%.1f", pitch * RAD2DGR) + "\n"
+                        + "  [Roll]: " + String.format("%.1f", roll * RAD2DGR) + "\n"
+                        + "  [Yaw]: " + String.format("%.1f", yaw * RAD2DGR) + "\n"
                         + "  [dt]: " + String.format("%.4f", dt));
             }
+
+
+            // 파일에 저장
+            cnt++;
+
+            if(cnt == 0) {
+                String ess = Environment.getExternalStorageState();
+                String sdCardPath = null;
+                if (ess.equals(Environment.MEDIA_MOUNTED)) {
+                    sdCardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+                    showMsg("SD Card stored in " + sdCardPath);
+                } else {
+                    showMsg("SD Card not ready!");
+                }
+
+                File file = new File(sdCardPath + "/test1");
+                File file1 = new File(sdCardPath + "/test1/text.txt");
+
+                if (!file.exists()) {
+                    file.mkdir();
+                    showMsg("기존에없던 폴더가 생성되었습니다.");
+                }
+
+                try {
+                    FileOutputStream fos = new FileOutputStream(file1);
+                    String msg = "GYROSCOPE\n  [X]:" + String.format("%.4f", event.values[0]) + "\n" + "  [Y]:" + String.format("%.4f", event.values[1]) + "\n"
+                            + "  [Z]:" + String.format("%.4f", event.values[2]) + "\n"
+                            + "  [Pitch]: " + String.format("%.1f", pitch * RAD2DGR) + "\n"
+                            + "  [Roll]: " + String.format("%.1f", roll * RAD2DGR) + "\n"
+                            + "  [Yaw]: " + String.format("%.1f", yaw * RAD2DGR) + "\n"
+                            + "  [dt]: " + String.format("%.4f", dt);
+                    fos.write(msg.getBytes());
+                    fos.close();
+                } catch (FileNotFoundException fnfe) {
+                    showMsg("지정된 파일을 생성할 수 없습니다.");
+                } catch (IOException ioe) {
+                    showMsg("파일에 데이터를 쓸 수 없습니다.");
+                }
+            }else {
+
+                //파일 이어쓰기
+                String ess = Environment.getExternalStorageState();
+                String sdCardPath = null;
+                if (ess.equals(Environment.MEDIA_MOUNTED)) {
+                    sdCardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+                    showMsg("SD Card stored in " + sdCardPath);
+                } else {
+                    showMsg("SD Card not ready!");
+                }
+
+                String logPath = sdCardPath + "/test1/text.txt"; //파일 경로
+
+                File templog = new File(logPath);
+
+                try {
+                    RandomAccessFile raf = new RandomAccessFile(logPath, "rw"); //이어쓰기용
+                    raf.seek(raf.length());//맨마지막 위치로 커서 이동
+                    String str = "GYROSCOPE\n  [X]:" + String.format("%.4f", event.values[0]) + "\n" + "  [Y]:" + String.format("%.4f", event.values[1]) + "\n"
+                            + "  [Z]:" + String.format("%.4f", event.values[2]) + "\n"
+                            + "  [Pitch]: " + String.format("%.1f", pitch * RAD2DGR) + "\n"
+                            + "  [Roll]: " + String.format("%.1f", roll * RAD2DGR) + "\n"
+                            + "  [Yaw]: " + String.format("%.1f", yaw * RAD2DGR) + "\n"
+                            + "  [dt]: " + String.format("%.4f", dt); //기록할 글
+                    raf.writeBytes(str);
+                    raf.close();
+
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        private void showMsg(String msg)
+        {
+            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
         }
 
         @Override

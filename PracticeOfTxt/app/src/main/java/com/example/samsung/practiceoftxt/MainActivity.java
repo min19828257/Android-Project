@@ -174,6 +174,7 @@ public class MainActivity extends Activity {
             if(cnt == 0) {
                 String ess = Environment.getExternalStorageState();
                 String sdCardPath = null;
+                String logPath = sdCardPath + "/test1/text.txt"; //파일 경로
                 if (ess.equals(Environment.MEDIA_MOUNTED)) {
                     sdCardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
                     showMsg("SD Card stored in " + sdCardPath);
@@ -191,21 +192,17 @@ public class MainActivity extends Activity {
 
                 try {
                     FileOutputStream fos = new FileOutputStream(file1);
-                    String msg = "GYROSCOPE\n  [X]:" + String.format("%.4f", event.values[0]) + "\n" + "  [Y]:" + String.format("%.4f", event.values[1]) + "\n"
-                            + "  [Z]:" + String.format("%.4f", event.values[2]) + "\n"
-                            + "  [Pitch]: " + String.format("%.1f", pitch * RAD2DGR) + "\n"
-                            + "  [Roll]: " + String.format("%.1f", roll * RAD2DGR) + "\n"
-                            + "  [Yaw]: " + String.format("%.1f", yaw * RAD2DGR) + "\n"
-                            + "  [dt]: " + String.format("%.4f", dt);
-                    fos.write(msg.getBytes());
-                    fos.close();
+                    String msg = "GYROSCOPE\n[X]:" + "[Y]" + "[Z]"+ "[Pitch]" + "[Roll]"+ "[Yaw]"+"[dt]";
+                    RandomAccessFile raf = new RandomAccessFile(logPath, "rw"); //이어쓰기용
+                    raf.seek(raf.length());//맨마지막 위치로 커서 이동
+                    raf.writeBytes(msg);
+                    raf.close();
                 } catch (FileNotFoundException fnfe) {
                     showMsg("지정된 파일을 생성할 수 없습니다.");
                 } catch (IOException ioe) {
                     showMsg("파일에 데이터를 쓸 수 없습니다.");
                 }
             }else {
-
                 //파일 이어쓰기
                 String ess = Environment.getExternalStorageState();
                 String sdCardPath = null;
@@ -217,7 +214,6 @@ public class MainActivity extends Activity {
                 }
 
                 String logPath = sdCardPath + "/test1/text.txt"; //파일 경로
-
                 File templog = new File(logPath);
 
                 try {
@@ -229,7 +225,14 @@ public class MainActivity extends Activity {
                             + "  [Roll]: " + String.format("%.1f", roll * RAD2DGR) + "\n"
                             + "  [Yaw]: " + String.format("%.1f", yaw * RAD2DGR) + "\n"
                             + "  [dt]: " + String.format("%.4f", dt); //기록할 글
-                    raf.writeBytes(str);
+                    String str1 = String.format("%.4f", event.values[0]) +
+                            "   " + String.format("%.4f", event.values[1]) +
+                            "   " + String.format("%.4f", event.values[2]) +
+                            "   "+  String.format("%.1f", pitch * RAD2DGR) +
+                            "   " + String.format("%.1f", roll * RAD2DGR) +
+                            "   " + String.format("%.1f", yaw * RAD2DGR) +
+                            "   " + String.format("%.4f", dt)+"\n"; //기록할 글
+                    raf.writeBytes(str1);
                     raf.close();
 
                 } catch (Exception e) {

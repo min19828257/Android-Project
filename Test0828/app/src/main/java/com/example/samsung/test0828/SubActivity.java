@@ -1,5 +1,10 @@
-package com.example.samsung.practiceoftxt;
+package com.example.samsung.test0828;
 
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,7 +31,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 
-public class MainActivity extends Activity {
+public class SubActivity extends AppCompatActivity {
+
+    Button btn_prev;
+
     private String fname = "memo.txt";
     private EditText ed;
 
@@ -52,12 +60,24 @@ public class MainActivity extends Activity {
     private double RAD2DGR = 180 / Math.PI;
     private static final float NS2S = 1.0f/1000000000.0f;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sub);
 
+        btn_prev = (Button)findViewById(R.id.btn_prev);
+        btn_prev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //이전 페이지로 화면 전환
+/*            Intent intent =
+                    new Intent(
+                            SubActivity.this, MainActivity.class);
+            startActivity(intent);*/
+
+                finish();
+            }
+        });
     }
 
     //버튼 눌렀을시
@@ -202,12 +222,7 @@ public class MainActivity extends Activity {
                 } catch (IOException ioe) {
                     showMsg("파일에 데이터를 쓸 수 없습니다.");
                 }
-            }
-
-
-            //cnt가 2이상일시
-
-            else {
+            }else {
                 //파일 이어쓰기
                 String ess = Environment.getExternalStorageState();
                 String sdCardPath = null;
@@ -231,12 +246,12 @@ public class MainActivity extends Activity {
                             + "  [Yaw]: " + String.format("%.1f", yaw * RAD2DGR) + "\n"
                             + "  [dt]: " + String.format("%.4f", dt); //기록할 글
                     String str1 = String.format("%.4f", event.values[0]) +
-                            " , " + String.format("%.4f", event.values[1]) +
-                            " , " + String.format("%.4f", event.values[2]) +
-                            " , "+  String.format("%.1f", pitch * RAD2DGR) +
-                            " , " + String.format("%.1f", roll * RAD2DGR) +
-                            " , " + String.format("%.1f", yaw * RAD2DGR) +
-                            " , " + String.format("%.4f", dt)+"\n"; //기록할 글
+                            "   " + String.format("%.4f", event.values[1]) +
+                            "   " + String.format("%.4f", event.values[2]) +
+                            "   "+  String.format("%.1f", pitch * RAD2DGR) +
+                            "   " + String.format("%.1f", roll * RAD2DGR) +
+                            "   " + String.format("%.1f", yaw * RAD2DGR) +
+                            "   " + String.format("%.4f", dt)+"\n"; //기록할 글
                     raf.writeBytes(str1);
                     raf.close();
 
@@ -258,3 +273,4 @@ public class MainActivity extends Activity {
         }
     }
 }
+

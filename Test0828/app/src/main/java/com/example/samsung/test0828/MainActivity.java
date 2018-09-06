@@ -1,5 +1,6 @@
 package com.example.samsung.test0828;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     String operator = "";
 
     EditText resultEdit;
+    Button btn_next;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +28,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         resultEdit = findViewById(R.id.editText);
+    }
+
+    public void intent(View v)
+    {
+            Intent intent =
+                        new Intent(MainActivity.this, SubActivity.class);
+             startActivity(intent);
     }
 
     public void onClick(View v) {

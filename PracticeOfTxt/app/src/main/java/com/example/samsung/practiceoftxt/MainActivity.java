@@ -29,6 +29,7 @@ import java.io.RandomAccessFile;
 public class MainActivity extends Activity {
     private String fname = "memo.txt";
     private EditText ed;
+    private boolean flag;
 
     static int cnt;
 
@@ -70,6 +71,7 @@ public class MainActivity extends Activity {
         //Using the Accelometer
         mGgyroSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         mGyroLis = new GyroscopeListener();
+        flag = true; //스탑버튼 위한 플래그
 
         //Touch Listener for Accelometer
         findViewById(R.id.a_start).setOnTouchListener(new View.OnTouchListener() {
@@ -88,6 +90,13 @@ public class MainActivity extends Activity {
                 return false;
             }
         });
+    }
+
+    //stop버튼
+    public void StopClick(View v) {
+        Toast.makeText(this,"플래그가 변경",Toast.LENGTH_SHORT).show();
+        flag = false;
+        Toast.makeText(this,"플래그가 변경",Toast.LENGTH_SHORT).show();
     }
 
     // 앱 종료시
@@ -211,6 +220,11 @@ public class MainActivity extends Activity {
                     showMsg("SD Card stored in " + sdCardPath);
                 } else {
                     showMsg("SD Card not ready!");
+                }
+
+                if(flag == false) {
+                    onPause();
+                    onStop();
                 }
 
                 String logPath = sdCardPath + "/test1/text.txt"; //파일 경로

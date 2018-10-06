@@ -9,6 +9,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,6 +22,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    private static double w = 37.555744 ;
+    private static double g = 126.970431;
+    private int cnt;
     private GoogleMap mMap;
     private final int MY_PERMISSION_REQUEST_ACCESS_FINE_LOCATION = 1;
 
@@ -34,6 +39,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    public void Tracking(View v) throws InterruptedException {
+
+        Toast.makeText(this, "차량의 위치추적을 시작합니다", Toast.LENGTH_SHORT).show();
+
+        w += 0.0001;
+        g += 0.0001;
+        SupportMapFragment mapFragment1 = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment1.getMapAsync(this);
+    /*
+    실시간으로 위치찍어주는 함수해야됨
+    */
+    }
+
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -43,14 +63,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         //화면의 초기화면 이동위치 나타내기
-        LatLng startingPoint = new LatLng(37.555744, 126.970431);// Starting 포인트 설정
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint,16)); // newLatingZoom 첫번째 매개변수: 스타팅포인트 두번째 매개변수: 줌레벨
+        LatLng startingPoint = new LatLng(w,g);// Starting 포인트 설정
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint,18)); // newLatingZoom 첫번째 매개변수: 스타팅포인트 두번째 매개변수: 줌레벨
 
         // 사용자가 권한 승인시 내현위치기능 활성화, 권한 안할시 권한요청창 띄우기
         if(checkPermission()) {
@@ -64,11 +84,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setMyLocationButtonEnabled(true);  //나의 현재위치 알아내기
 
         // Add a marker in Sydney and move the camera 실제 이동방향의 화살표의 위치
-        LatLng sydney = new LatLng(37.555744, 126.970431);
+        LatLng sydney = new LatLng(w,g);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-
     }
 
     private boolean checkPermission() {

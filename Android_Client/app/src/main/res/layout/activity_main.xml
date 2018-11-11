@@ -8,8 +8,9 @@
 
     <EditText
         android:id="@+id/EditText01"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="325dp"
+        android:layout_height="49dp"
+        tools:layout_editor_absoluteX="59dp" />
 
     <Button
         android:id="@+id/Button01"
